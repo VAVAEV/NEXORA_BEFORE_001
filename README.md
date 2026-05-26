@@ -4,7 +4,9 @@
 
 # NEXORA
 
-### A single-page cinematic studio site.
+### Одностраничник студии. Семь миров за один скролл. Кинематика, понты, частицы.
+
+<sub><i>A single-page cinematic studio site. Seven worlds in one scroll.</i></sub>
 
 [![▸ LIVE](https://img.shields.io/badge/▸_LIVE_DEMO-nexora--6b0e9.web.app-FF4466?style=for-the-badge)](https://nexora-6b0e9.web.app)
 
@@ -26,68 +28,86 @@
 
 ---
 
-## What you'll see
+## Привет, Матвей 👋
 
-Seven scroll-driven sections, each with its own interactive language.
+Это сайт студии **NEXORA** — фейковая дижитал-студия, но эффекты настоящие. Семь секций, каждая со своим характером:
 
-| | Section | Highlight |
-|---|---|---|
-| **01** | **Hero** | Pulsating SVG logo with contour-anchored particle shedding on each heartbeat · pseudo-3D parallax (five stacked SVG layers) reacting to mouse position · gravitational waves rippling through the background dot grid. |
-| **02** | **Mission** | Animated counters, Vision 2030 partnership card. Unified glass + sweep entrance, no scroll-tied wobble. |
-| **03** | **Services** | Five-row accordion with hover reveal, sliding logo glyph, plus-rotate icon. |
-| **04** | **Industries** | Bento grid of 3D-tilted glass cards with morphing dot-grid icons that resolve into the logo on hover. |
-| **05** | **Portfolio ×7** | Sticky vertical-scroll → horizontal-track of seven dedicated visualization surfaces (full list below). |
-| **06** | **Contact** | Magnetic submit button + glass form on the same design system. |
+- **Hero** — лого пульсирует как сердце. На каждом втором ударе с его **настоящего контура** отрывает частицы (через `path.getPointAtLength()`, не из рандомной точки), плюс **псевдо-3D из пяти SVG-слоёв** с разным rotation от позиции мышки. Фоновая сетка точек реагирует гравитационными волнами на каждый "тук".
+- **Mission** — карточка с миссией + четыре анимированных счётчика. Раньше тут была хуйня со scroll-driven `scale + rotate` которая блюрила glass-слой при каждом тике скролла — снёс, теперь чисто.
+- **Services** — пятиполосный аккордеон. Hover открывает row, показывает glyph, плюсик крутится на 45°.
+- **Industries** — бенто из стеклянных карточек с 3D-тильтом по мыши. Иконки-точки при наведении **собираются в наш лого** (60 точек, каждая морфится по углу к ближайшей точке логотипа).
+- **Portfolio ×7** — sticky-вьюпорт. Вертикальный скролл превращается в горизонтальный track. Семь кейсов, каждый со своей анимацией: `Datoo` (геоданные на карте), `ABIR Holdings` (industrial digital twin), `CyberBook` (гейм-компаньон + custom cursor), `Myco.OS` (грибы растут под курсором), `Sidus Heroes` (Web3 планетарная система), `City Expo` (дома вырастают под мышкой), `Reel.AI` (AI pipeline с режиссёрским монитором и кинолентой).
+- **Contact** — форма + магнитная кнопка которая прыгает к курсору.
 
-### Portfolio surfaces
-
-`Datoo` — interactive geo-data map · `ABIR Holdings` — industrial digital twin · `CyberBook` — game companion + cursor sprites · `Myco.OS` — mushroom growth under hover spotlight · `Sidus Heroes` — Web3 planetary system · `City Expo` — buildings growing on hover · `Reel.AI` — AI content pipeline with director's monitor + filmstrip.
+> **EN:** This is the NEXORA studio site — a fictional digital agency, real effects. Seven sections, each with its own behavior: heartbeat logo with **contour-anchored particle bursts** (via `path.getPointAtLength`), pseudo-3D logo from five stacked SVG layers, mission card on a unified glass system, accordion services, 3D-tilted bento Industries with dot-grid icons that morph into the logo, a sticky horizontal-scroll portfolio of seven cases each with its own visualization surface, and a magnetic contact form.
 
 ---
 
-## Stack notes
+## Стек, ёбана
+
+Без сборки, без бандлера, без npm. Открыл `index.html` — оно работает.
 
 | | |
 |---|---|
-| **No build step** | JSX compiled in-browser by Babel Standalone, scripts loaded directly by `index.html` in dependency order. Zero npm, zero bundler. |
-| **Animation** | Framer Motion for declarative entrances · Canvas 2D for the background dot grid + bezier waves · raw `requestAnimationFrame` for the high-frequency stuff (logo heartbeat, mouse-followers, particle bursts). |
-| **3D / SVG** | Pseudo-3D logo built from five stacked SVG layers, each rotated by CSS variables written from mouse position. Particles emitted via `path.getPointAtLength` for **true contour-anchored bursts** — not random offsets. |
-| **Glass system** | Unified utility classes — `.glass`, `.glass-soft`, `.sweep`, `.lift`, `.nx-glass` — one visual language across every card on the site. |
-| **Pixel-perfect grid** | Portfolio first-card left edge is **measured at runtime** from the real `.container` `getBoundingClientRect().left` and written to a CSS variable. Survives scrollbar width, browser zoom, and any `calc()`-with-`min()` quirks. |
-| **Hosting** | Firebase Hosting. Single static deploy, no server. |
+| **JSX в браузере** | Babel Standalone компилит на лету. React 18 + Framer Motion 11 — оба с CDN. |
+| **Стили** | Tailwind CDN + `styles.css` со своими утилитарными классами (`.glass`, `.glass-soft`, `.sweep`, `.lift`, `.nx-glass`) — один визуальный язык на весь сайт. |
+| **Анимации** | Framer Motion для declarative-входов. **Canvas 2D** для фоновых точек и bezier-волн. **Raw `requestAnimationFrame`** для всего что должно крутиться 60 fps без React-рендеров (heartbeat, частицы, mouse-followers, mushroom growth, building scaleY). |
+| **3D / SVG** | Никаких WebGL и Three.js — **псевдо-3D через стопку SVG-слоёв** с CSS-переменными `--orb-rx` / `--orb-ry` от позиции мышки. Частицы рождаются **на контуре** через `getPointAtLength()` плюс `getScreenCTM()` для перевода в экранные координаты. |
+| **Pixel-perfect grid** | Левая кромка карточек в Portfolio вычисляется **в рантайме** из `document.querySelector('.container').getBoundingClientRect().left` — потому что `calc((100vw - min(1280px, 92vw)) / 2)` отстаёт от `.container { margin: 0 auto }` на полширины скроллбара (~7–15 px). Битый час на это убил. |
+| **Хостинг** | Firebase Hosting. Статика, ноль серверов. |
+
+> **EN:** No build, no bundler, no npm — open `index.html` and it runs. React 18 + Framer Motion 11 via CDN; Babel Standalone compiles JSX in the browser. Tailwind CDN + custom utility classes for a unified glass system. Framer Motion for declarative entrances, Canvas 2D for background dots and bezier waves, raw `requestAnimationFrame` for 60 fps work. Pseudo-3D from stacked SVG layers driven by CSS vars; particles emitted via `path.getPointAtLength` for contour-anchored bursts. Portfolio grid alignment measured at runtime from `getBoundingClientRect` because `calc(min(), vw)` drifts by half a scrollbar against `margin: 0 auto`. Firebase Hosting.
 
 ---
 
-## File map
+## Карта файлов
 
 ```
-index.html ──► hooks.jsx                  shared bus · intersection · magnetic
-              motion-primitives.jsx       FadeIn · RevealText · SectionHead
-              glass-nav.jsx               floating nav · logo glyph
-              environment.jsx             bg mesh · dots canvas · waves · vignette
-              hero.jsx                    hero layout · heartbeat logo · particles
-              sections-a.jsx              Marquee · Mission · Services
-              sections-b.jsx              Industries bento
-              portfolio-surfaces2.jsx     Myco / Sidus / CityExpo surfaces
-              portfolio-surfaces3.jsx     Reel.AI surface
-              portfolio.jsx               Portfolio + Datoo / ABIR / CyberBook
-              app.jsx                     composition root
+index.html ─► hooks.jsx                  общий анимационный бас, intersection, magnetic
+             motion-primitives.jsx       FadeIn, RevealText, SectionHead
+             glass-nav.jsx               навигация, логотип-глиф
+             environment.jsx             фон, dot-grid canvas, волны, виньетка
+             hero.jsx                    верхний экран, сердцебиение, частицы, 3D-стек
+             sections-a.jsx              маркее, миссия, услуги
+             sections-b.jsx              индастрис бенто, контактная форма
+             portfolio-surfaces2.jsx     Myco / Sidus / CityExpo surfaces
+             portfolio-surfaces3.jsx     Reel.AI surface
+             portfolio.jsx               Portfolio + Datoo / ABIR / CyberBook
+             app.jsx                     склейка всего
 ```
 
-Each portfolio surface uses a smoothed three-tier mouse tracker (`useSurfaceMouse*`): CSS variables on the hot path (60 fps writes, zero React renders), epsilon-throttled React state for layout-driving children, and a `subscribeRaw` channel for direct-DOM cursor-followers.
+Каждая surface-карточка портфолио тащит мышку через **трёхъярусный `useSurfaceMouse*`**:
+
+1. **CSS-переменные** на горячем пути → 60 fps без single React render
+2. **React state с epsilon-throttle** для тяжёлых SVG-детей (рендер только когда мышка реально сдвинулась >0.3%)
+3. **`subscribeRaw` канал** для прямого DOM-апдейта спрайтов и кастомных курсоров (мимо React, сразу в `setAttribute('transform', ...)`)
+
+Плюс lerp-смузинг на mouseenter/mouseleave чтобы карточка не **стрикала** к мышке при заходе курсора в её область (была эта парадокс с "magnetic snap" по всему сайту, фиксил централизованно).
+
+> **EN:** Each portfolio surface uses a three-tier mouse tracker: CSS variables on the hot path (60 fps, zero React renders), epsilon-throttled React state for layout-driving SVG children, and a `subscribeRaw` channel for direct-DOM cursor-followers. Lerp-smoothing on mouseenter/leave kills the magnetic snap-to-cursor across every surface.
 
 ---
 
-## Note
+## По-братски
 
-This site was built with significant AI assistance, iterated against visual feedback over many passes. It's not flawless — but every section runs in production, the architecture is laid out above, and the entry point for any subsystem is one click away in the file map.
+Матвей, шо тебе сказать. Код собран с **дикой помощью нейронок** — итераций было дохуя. Я по скриншотам гонял ассистента "нет, не так, передвинь, переделай, что за параша, почему так криво". Не Apple-grade, не флагман, не Higgsfield.
 
-Handed over as-is.
+Но:
+- **Всё бежит в проде.** Открой live — оно живое.
+- **Архитектура расписана выше**, поковыряешься за пару часов — поймёшь что где.
+- **Файлы маленькие** (самый большой `portfolio.jsx` ≈ 50 KB), без бандлера, всё видно глазами в DevTools без source maps.
+- **Один визуальный язык** — glass-утилиты унифицированы, FadeIn один на всех, mouse-tracker один на всех portfolio surfaces.
+
+Если что-то нашёл стрёмное — это либо нейронка решила что так красиво, либо я задолбался на восьмой итерации и оставил как есть. Бей не сильно, **передаю как есть**.
+
+> **EN:** Matvey, real talk — built with heavy AI assistance, lots of iterations against visual feedback. Not flagship-quality, not Apple-grade. **But:** everything runs in production, architecture is documented above, files are small (max ≈50 KB), no bundler — you can read it all in DevTools without sourcemaps. One visual language across the site. If something looks rough, it's either the AI's aesthetic choice or me giving up after iteration eight. Handed over as-is.
 
 ---
 
 <div align="center">
 
 **Built by MAX 256.**
+
+<sub>Лучший прогер на планете — это Матвей. Не шутка.</sub>
 
 </div>
